@@ -1,0 +1,43 @@
+VISION FIXTURE — the finished product, one real day.
+The observable life of tau inside Ticketflow (the Fastify SaaS). Read
+this FIRST; the other transcripts are close-ups of individual moments.
+
+Tuesday 09:14  A dev's PR adds a refund tool that needs Stripe egress.
+               CI: npx tau plan --check
+                 ! CAPABILITIES WIDEN  + net: api.stripe.com
+                 exit 3 → PR blocked
+               The reviewer reads the permission sheet, approves the
+               widening explicitly, PR merges.
+
+Tuesday 09:31  Deploy pipeline (unchanged except one step):
+                 app deploy … ok
+                 tau apply → pin b7e1a94c… → c09df2e7…
+                             nightly-sweep → systemd timer reloaded
+
+Tuesday 11:37  A customer POSTs /tickets. Inside the route handler:
+                 await pipelines.triage.run({ ticket })
+               engine (warm tau serve, out-of-process):
+                 ▶ classify    agent triage
+                 ▶ flagged?    branch → then   (billing_flag = true)
+                 ▶ billing     tool billing.lookup  (allowed: declared host)
+                 ▶ categorized check ok
+               → 200, verdict rendered to the support dashboard.
+               journal: .tau/runs/r-8801/journal.jsonl
+
+Wednesday 03:00  Nobody is awake. The systemd timer fires nightly-sweep:
+                 tau run triage  input={ticket:{source:"backlog"}}
+                 ▶ classify … ▶ categorized check FAILED: category = ""
+                 run recorded as failed; journal kept.
+
+Wednesday 09:05  On-call picks it up with coffee, not at 3 a.m.:
+                 $ scp prod:.tau/runs/r-8823/journal.jsonl ./
+                 $ tau replay ./journal.jsonl
+                 ...the misfire reproduces bit-identically: the agent
+                 returns an empty category for source=backlog inputs.
+                 Fix: tighten the agent instructions for backlog tickets
+                 (a tau/agents/triage.md edit — a TOML-lane diff any
+                 reviewer can read), re-pin, done.
+
+What this story is evidence for: widening is loud and blocks (invariant
+5), deploy is one added step, runs are out-of-process and journaled
+(invariants 2, 11), and debugging is replay, not log archaeology.

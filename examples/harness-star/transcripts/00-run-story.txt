@@ -1,0 +1,54 @@
+VISION FIXTURE — the finished product, one real day.
+The observable life of Fieldbook run r-1207, across processes, deploys,
+and a two-hour human pause. Read this FIRST; the other transcripts are
+close-ups of individual moments.
+
+Monday 14:01  checkout latency alert PD-4412 pages the on-call engineer.
+              She opens Fieldbook (the team's Python app) and hits enter.
+
+              Harness.connect() → obligations verified: 3/3 host tools
+              present (metrics.query, pager.ack, runbook.apply). Session
+              accepted. [had one been missing: refused HERE, see
+              02-refusal.txt]
+
+Monday 14:02  h.pipelines.runbook_exec.run(RunbookRef("rb-checkout", "PD-4412"))
+
+              ▶ prepare      agent runbook-executor starts
+              ⇠ metrics.query  reverse-dispatch → the team's own promql code
+              ▶ prepare      completed: plan = "restart checkout-workers,
+                             drain queue first", rationale attached
+              ▶ apply-fix    gate reached → run SUSPENDS
+              journal on disk: r-1207 suspended at runbook-exec/apply-fix
+              Slack (the team's approval UI, via on_approval):
+                "Approve applying: restart checkout-workers? [Approve][Deny]"
+
+              ← the tau process exits. Nothing is in memory. The approver
+                is at lunch. The team even deploys an unrelated host
+                change at 15:10 — the suspended run doesn't care: its
+                state is the journal + the pinned IR, not a process.
+
+Monday 16:30  Dana clicks Approve.
+              The host resumes the run at its address:
+                r-1207 · gate runbook-exec/apply-fix · {approved: true,
+                note: "confirmed with @sam"}
+
+              ▶ apply-fix    resumed: APPROVED (journaled: by dana@, 16:30)
+              ⇠ runbook.apply  reverse-dispatch → runbook_runner.apply()
+              ⇢ runbook.apply  status=applied
+              ⇠ metrics.query  verify: p99 latency recovering
+              ⇠ pager.ack     incident PD-4412 acknowledged
+              ▶ run          completed: Applied
+
+Monday 16:32  Slack: "PD-4412 resolved. Fix applied with approval."
+
+Tuesday 10:00 incident review. Nobody argues about what happened:
+
+              $ tau replay .tau/runs/r-1207/journal.jsonl
+              ...every step, every host-tool crossing, the elicitation,
+              Dana's decision with timestamp — replayed verbatim against
+              ir sha256:9f3ac2d15e08.
+
+What this story is evidence for: refusal-up-front (invariant 8), durable
+suspension across process death and deploys (invariant 11), the gate id
+as the address a human holds for two hours, and an audit trail that is
+the run itself, not a reconstruction.
