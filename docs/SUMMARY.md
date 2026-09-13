@@ -158,11 +158,13 @@
 - [ADR-0068 — Wasm guest executes IR control-flow in-guest](decisions/0068-wasm-guest-control-flow.md)
 - [ADR-0069 — Directory-based tool & agent definitions](decisions/0069-directory-based-definitions.md)
 - [ADR-0070 — `AgentId` grammar: namespaced authored names, sanitized generated ones](decisions/0070-agent-id-grammar.md)
+- [ADR-0071 — tau, rebooted: this repository becomes tau v1](decisions/0071-tau-rebooted.md)
 
 # Retrospectives
 
 - [Phase 0](retrospectives/phase-0.md)
 - [Phase 0 mid-phase](retrospectives/phase-0-mid.md)
+- [Kernel-reboot handoff (final session entry)](retrospectives/2026-09-13-kernel-reboot-handoff.md)
 
 # Project artifacts
 

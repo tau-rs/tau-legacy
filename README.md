@@ -1,4 +1,14 @@
-# tau
+# tau v1 — archived
+
+> **This repository is tau v1, the prototype. It is archived and read-only.**
+> tau was rebooted as an agent kernel; active development lives in
+> [`tau-rs/tau`](https://github.com/tau-rs/tau). v1 explored the territory;
+> that tau is the kernel. Why: [ADR-0071 — tau, rebooted](docs/decisions/0071-tau-rebooted.md)
+> and the [kernel-reboot handoff](docs/retrospectives/2026-09-13-kernel-reboot-handoff.md).
+
+Everything below describes tau v1 as it stood at the reboot, unchanged.
+
+---
 
 [![CI](https://github.com/LEBOCQTitouan/tau/actions/workflows/ci.yml/badge.svg)](https://github.com/LEBOCQTitouan/tau/actions/workflows/ci.yml)
 
